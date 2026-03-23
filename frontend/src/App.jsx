@@ -1,161 +1,127 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from "react";
+import "./styles.css";
 
-const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || '').replace(/\/$/, '')
-
-function formatNGN(value) {
-  return new Intl.NumberFormat('en-NG', {
-    style: 'currency',
-    currency: 'NGN',
+function formatNGN(amount) {
+  return new Intl.NumberFormat("en-NG", {
+    style: "currency",
+    currency: "NGN",
     maximumFractionDigits: 0,
-  }).format(Number(value || 0))
+  }).format(amount);
 }
 
+const API_BASE = import.meta.env.VITE_API_BASE_URL;
+
 export default function App() {
-  const [properties, setProperties] = useState([])
-  const [search, setSearch] = useState('')
-  const [verifiedOnly, setVerifiedOnly] = useState(false)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState('')
-  const [selected, setSelected] = useState(null)
+  const [listings, setListings] = useState([]);
+  const [query, setQuery] = useState("");
+  const [verifiedOnly, setVerifiedOnly] = useState(false);
+  const [error, setError] = useState("");
 
   useEffect(() => {
-    async function fetchProperties() {
+    async function loadListings() {
       try {
-        setLoading(true)
-        setError('')
-
-        const url = API_BASE_URL ? `${API_BASE_URL}/api/properties` : '/api/properties'
-        const response = await fetch(url)
-
-        if (!response.ok) {
-          throw new Error(`Request failed with status ${response.status}`)
-        }
-
-        const data = await response.json()
-        setProperties(Array.isArray(data) ? data : [])
+        setError("");
+        const res = await fetch(`${API_BASE}/api/properties`);
+        if (!res.ok) throw new Error("Failed to fetch listings");
+        const data = await res.json();
+        setListings(data);
       } catch (err) {
-        console.error('Failed to load properties:', err)
-        setError('Unable to load listings right now. Check your backend URL and redeploy.')
-      } finally {
-        setLoading(false)
+        setError("Unable to load listings right now. Check your backend URL and redeploy.");
       }
     }
-
-    fetchProperties()
-  }, [])
+    loadListings();
+  }, []);
 
   const filtered = useMemo(() => {
-    const q = search.trim().toLowerCase()
-    return properties.filter((property) => {
-      const matchesSearch = !q || [
-        property.title,
-        property.area,
-        property.address,
-        property.type,
-      ].some((field) => String(field || '').toLowerCase().includes(q))
+    return listings.filter((item) => {
+      const matchesQuery =
+        !query ||
+        item.title.toLowerCase().includes(query.toLowerCase()) ||
+        item.area.toLowerCase().includes(query.toLowerCase()) ||
+        item.address.toLowerCase().includes(query.toLowerCase()) ||
+        item.type.toLowerCase().includes(query.toLowerCase());
 
-      const matchesVerified = !verifiedOnly || property.verified
-      return matchesSearch && matchesVerified
-    })
-  }, [properties, search, verifiedOnly])
+      const matchesVerified = !verifiedOnly || item.verified;
+      return matchesQuery && matchesVerified;
+    });
+  }, [listings, query, verifiedOnly]);
 
   return (
-    <div className="page">
-      <header className="hero">
-        <div>
-          <p className="eyebrow">RentConnect NG</p>
-          <h1>Lagos apartment rental hub</h1>
-          <p className="hero-text">
+    <main className="app-shell">
+      <section className="hero">
+        <div className="hero-copy">
+          <span className="brand">RentConnect NG</span>
+          <h1 className="hero-title">Lagos apartment rental hub</h1>
+          <p className="hero-subtitle">
             Verified apartment listings across Lekki, Yaba, Ikeja, Surulere, and more.
           </p>
         </div>
-        <div className="hero-card">
-          <div className="search-block">
-            <input
-              type="text"
-              placeholder="Search by area, address, or apartment type"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-            />
-            <label className="toggle-row">
+
+        <aside className="hero-panel">
+          <input
+            className="search-input"
+            type="text"
+            placeholder="Search by area, address, or apartment type"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+          />
+
+          <div className="filter-row">
+            <label className="checkbox-wrap">
               <input
                 type="checkbox"
                 checked={verifiedOnly}
                 onChange={(e) => setVerifiedOnly(e.target.checked)}
               />
-              Verified listings only
+              <span>Verified listings only</span>
             </label>
           </div>
-          <div className="stat-grid">
-            <div>
-              <strong>{properties.length}</strong>
-              <span>Total listings</span>
+
+          <div className="stats-grid">
+            <div className="stat-card">
+              <p className="stat-value">{listings.length}</p>
+              <p className="stat-label">Total listings</p>
             </div>
-            <div>
-              <strong>{filtered.length}</strong>
-              <span>Matching now</span>
+            <div className="stat-card">
+              <p className="stat-value">{filtered.length}</p>
+              <p className="stat-label">Matching now</p>
             </div>
           </div>
-        </div>
-      </header>
+        </aside>
+      </section>
 
-      <main>
-        {loading && <div className="notice">Loading listings...</div>}
-        {!loading && error && <div className="notice error">{error}</div>}
-        {!loading && !error && filtered.length === 0 && (
-          <div className="notice">No listings matched your current search.</div>
-        )}
+      {error ? <div className="feedback error">{error}</div> : null}
 
-        <section className="grid">
-          {filtered.map((property) => (
-            <article className="card" key={property.id}>
-              <img src={property.image} alt={property.title} className="card-image" />
-              <div className="card-body">
-                <div className="pill-row">
-                  <span className="pill pill-area">{property.area}</span>
-                  {property.verified ? <span className="pill pill-verified">Verified</span> : null}
+      <section className="listings-grid">
+        {filtered.length === 0 ? (
+          <div className="empty-state">No listings matched your search.</div>
+        ) : (
+          filtered.map((item) => (
+            <article key={item.id} className="listing-card">
+              <img className="listing-image" src={item.image} alt={item.title} />
+              <div className="listing-body">
+                <div className="tag-row">
+                  <span className="tag area">{item.area}</span>
+                  {item.verified ? <span className="tag verified">Verified</span> : null}
                 </div>
-                <h2>{property.title}</h2>
-                <p className="muted">{property.address}</p>
-                <p className="price">{formatNGN(property.annualRent)} <span>/ year</span></p>
-                <p className="meta">{property.beds} bed · {property.baths} bath · {property.type}</p>
-                <button className="primary-button" onClick={() => setSelected(property)}>
+
+                <h2 className="listing-title">{item.title}</h2>
+                <p className="listing-address">{item.address}</p>
+                <p className="listing-price">
+                  {formatNGN(item.annualRent)} <span>/ year</span>
+                </p>
+                <p className="listing-meta">
+                  {item.beds} bed · {item.baths} bath · {item.type}
+                </p>
+
+                <button className="primary-btn" type="button">
                   View details
                 </button>
               </div>
             </article>
-          ))}
-        </section>
-      </main>
-
-      {selected && (
-        <div className="modal-backdrop" onClick={() => setSelected(null)}>
-          <div className="modal" onClick={(e) => e.stopPropagation()}>
-            <button className="close-button" onClick={() => setSelected(null)}>×</button>
-            <img src={selected.image} alt={selected.title} className="modal-image" />
-            <div className="modal-body">
-              <div className="pill-row">
-                <span className="pill pill-area">{selected.area}</span>
-                {selected.verified ? <span className="pill pill-verified">Verified listing</span> : null}
-              </div>
-              <h2>{selected.title}</h2>
-              <p className="muted">{selected.address}</p>
-              <p className="price">{formatNGN(selected.annualRent)} <span>/ year</span></p>
-              <p>{selected.description}</p>
-              <div className="inspection-box">
-                <h3>Book inspection</h3>
-                <p className="muted">Inspection fee: {formatNGN(selected.inspectionFee)}</p>
-                <div className="form-grid">
-                  <input type="text" placeholder="Full name" />
-                  <input type="tel" placeholder="Phone number" />
-                  <input type="date" />
-                  <button className="primary-button" type="button">Book now</button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
-  )
+          ))
+        )}
+      </section>
+    </main>
+  );
 }
