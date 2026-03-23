@@ -188,110 +188,108 @@ Message: ${payload.message}`;
         </div>
       </header>
 
-      <section className="hero">
-        <div className="hero-main">
-          <h1 className="hero-title">Lagos apartment rental hub</h1>
-          <p className="hero-subtitle">
-            Verified apartments, shortlets, serviced apartments, and
-            Airbnb-style stays across Lekki, Yaba, Ikeja, Ikoyi, Gbagada,
-            Ogba, Ikorodu, Apapa, and more.
-          </p>
+     <section className="hero hero-banner">
+  <div className="hero-main">
+    <h1 className="hero-title">Lagos apartment rental hub</h1>
+    <p className="hero-subtitle">
+      Verified apartments, shortlets, serviced apartments, and Airbnb-style stays
+      across Lekki, Yaba, Ikeja, Ikoyi, Gbagada, Ogba, Ikorodu, Apapa, and more.
+    </p>
 
-          <div className="hero-actions">
-            <button
-              className="hero-btn primary"
-              onClick={() =>
-                window.scrollTo({ top: 700, behavior: "smooth" })
-              }
-              type="button"
-            >
-              Browse listings
-            </button>
-            <button
-              className="hero-btn secondary"
-              onClick={() =>
-                openWhatsApp({
-                  title: "General apartment inquiry",
-                  address: "Lagos",
-                  area: "Lagos"
-                })
-              }
-              type="button"
-            >
-              WhatsApp us
-            </button>
-          </div>
-        </div>
+    <div className="hero-actions">
+      <button
+        className="hero-btn primary"
+        onClick={() => window.scrollTo({ top: 780, behavior: "smooth" })}
+        type="button"
+      >
+        Browse listings
+      </button>
 
-        <aside className="filter-panel">
-          <h3>Quick filter</h3>
+      <button
+        className="hero-btn secondary"
+        onClick={() =>
+          openWhatsApp({
+            title: "General apartment inquiry",
+            address: "Lagos",
+            area: "Lagos"
+          })
+        }
+        type="button"
+      >
+        WhatsApp us
+      </button>
+    </div>
+  </div>
 
-          <input
-            className="control"
-            type="text"
-            placeholder="Search by title, area, address"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-          />
+  <aside className="filter-panel">
+    <h3>Quick filter</h3>
 
-          <div className="filter-grid">
-            <select
-              className="control"
-              value={area}
-              onChange={(e) => setArea(e.target.value)}
-            >
-              {lagosAreas.map((item) => (
-                <option key={item}>{item}</option>
-              ))}
-            </select>
+    <input
+      className="control"
+      type="text"
+      placeholder="Search by title, area, address"
+      value={query}
+      onChange={(e) => setQuery(e.target.value)}
+    />
 
-            <select
-              className="control"
-              value={type}
-              onChange={(e) => setType(e.target.value)}
-            >
-              {propertyTypes.map((item) => (
-                <option key={item}>{item}</option>
-              ))}
-            </select>
-          </div>
+    <div className="filter-grid">
+      <select
+        className="control"
+        value={area}
+        onChange={(e) => setArea(e.target.value)}
+      >
+        {lagosAreas.map((item) => (
+          <option key={item}>{item}</option>
+        ))}
+      </select>
 
-          <label className="checkbox-wrap">
-            <input
-              type="checkbox"
-              checked={verifiedOnly}
-              onChange={(e) => setVerifiedOnly(e.target.checked)}
-            />
-            <span>Verified listings only</span>
-          </label>
+      <select
+        className="control"
+        value={type}
+        onChange={(e) => setType(e.target.value)}
+      >
+        {propertyTypes.map((item) => (
+          <option key={item}>{item}</option>
+        ))}
+      </select>
+    </div>
 
-          <div className="budget-wrap">
-            <label>
-              Budget up to: <strong>{formatNGN(maxBudget)}</strong>
-            </label>
-            <input
-              type="range"
-              min="500000"
-              max="10000000"
-              step="250000"
-              value={maxBudget}
-              onChange={(e) => setMaxBudget(Number(e.target.value))}
-            />
-          </div>
+    <label className="checkbox-wrap">
+      <input
+        type="checkbox"
+        checked={verifiedOnly}
+        onChange={(e) => setVerifiedOnly(e.target.checked)}
+      />
+      <span>Verified listings only</span>
+    </label>
 
-          <div className="stats-grid">
-            <div className="stat-card">
-              <strong>{listings.length}</strong>
-              <span>Total listings</span>
-            </div>
-            <div className="stat-card">
-              <strong>{filtered.length}</strong>
-              <span>Matching now</span>
-            </div>
-          </div>
-        </aside>
-      </section>
+    <div className="budget-wrap">
+      <label>
+        Budget up to: <strong>{formatNGN(maxBudget)}</strong>
+      </label>
+      <input
+        type="range"
+        min="500000"
+        max="10000000"
+        step="250000"
+        value={maxBudget}
+        onChange={(e) => setMaxBudget(Number(e.target.value))}
+      />
+    </div>
 
+    <div className="stats-grid">
+      <div className="stat-card">
+        <strong>{listings.length}</strong>
+        <span>Total listings</span>
+      </div>
+      <div className="stat-card">
+        <strong>{filtered.length}</strong>
+        <span>Matching now</span>
+      </div>
+    </div>
+  </aside>
+</section>
+      
       <section className="feature-row">
         <div className="feature-card">
           <h3>Available property types</h3>
