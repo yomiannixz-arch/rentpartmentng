@@ -4,6 +4,7 @@ import "./styles.css";
 const API = import.meta.env.VITE_API_BASE_URL;
 
 const lagosAreas = [
+  "All",
   "Lekki",
   "Yaba",
   "Ikeja",
@@ -23,7 +24,6 @@ const lagosAreas = [
   "Sangotedo",
   "Victoria Island",
   "Chevron",
-  "Egba",
   "Oshodi",
   "Mushin",
   "Bariga"
@@ -78,12 +78,14 @@ export default function App() {
         setLoading(false);
       }
     }
+
     loadListings();
   }, []);
 
   const filtered = useMemo(() => {
     return listings.filter((item) => {
       const q = query.trim().toLowerCase();
+
       const matchesQuery =
         !q ||
         item.title?.toLowerCase().includes(q) ||
@@ -94,15 +96,25 @@ export default function App() {
       const matchesArea = area === "All" || item.area === area;
       const matchesType = type === "All" || item.type === type;
       const matchesVerified = !verifiedOnly || item.verified;
-      const matchesBudget = Number(item.annualRent || item.price || 0) <= maxBudget;
+      const matchesBudget =
+        Number(item.annualRent || item.price || 0) <= maxBudget;
 
-      return matchesQuery && matchesArea && matchesType && matchesVerified && matchesBudget;
+      return (
+        matchesQuery &&
+        matchesArea &&
+        matchesType &&
+        matchesVerified &&
+        matchesBudget
+      );
     });
   }, [listings, query, area, type, verifiedOnly, maxBudget]);
 
   function openWhatsApp(property) {
     const text = `Hello, I am interested in "${property.title}" located at ${property.address} in ${property.area}. Please share inspection and availability details.`;
-    window.open(`https://wa.me/2348087156505?text=${encodeURIComponent(text)}`, "_blank");
+    window.open(
+      `https://wa.me/2348087156505?text=${encodeURIComponent(text)}`,
+      "_blank"
+    );
   }
 
   async function submitApplication(e) {
@@ -121,23 +133,24 @@ export default function App() {
     };
 
     try {
-      setApplications((prev) => [{ id: Date.now(), ...payload }, ...prev });
+      setApplications((prev) => [{ id: Date.now(), ...payload }, ...prev]);
 
       await fetch(`${API}/api/applications`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json"
+        },
         body: JSON.stringify(payload)
       }).catch(() => null);
 
       const mailtoSubject = `New apartment application - ${selected.title}`;
-      const mailtoBody = `
-Name: ${payload.name}
+      const mailtoBody = `Name: ${payload.name}
 Email: ${payload.email}
 Phone: ${payload.phone}
 Move-in Date: ${payload.moveInDate}
 Property: ${payload.propertyTitle}
-Message: ${payload.message}
-      `;
+Message: ${payload.message}`;
+
       window.open(
         `mailto:yomiannixz@gmail.com?subject=${encodeURIComponent(mailtoSubject)}&body=${encodeURIComponent(mailtoBody)}`,
         "_blank"
@@ -165,7 +178,11 @@ Message: ${payload.message}
       <header className="topbar">
         <div className="brand-wrap">
           <span className="brand-badge">RentConnect NG</span>
-          <button className="admin-link" onClick={() => setAdminOpen(true)} type="button">
+          <button
+            className="admin-link"
+            onClick={() => setAdminOpen(true)}
+            type="button"
+          >
             Admin
           </button>
         </div>
@@ -175,15 +192,32 @@ Message: ${payload.message}
         <div className="hero-main">
           <h1 className="hero-title">Lagos apartment rental hub</h1>
           <p className="hero-subtitle">
-            Verified apartments, shortlets, serviced apartments, and Airbnb-style stays
-            across Lekki, Yaba, Ikeja, Ikoyi, Gbagada, Ogba, Ikorodu, Apapa, and more.
+            Verified apartments, shortlets, serviced apartments, and
+            Airbnb-style stays across Lekki, Yaba, Ikeja, Ikoyi, Gbagada,
+            Ogba, Ikorodu, Apapa, and more.
           </p>
 
           <div className="hero-actions">
-            <button className="hero-btn primary" onClick={() => window.scrollTo({ top: 700, behavior: "smooth" })}>
+            <button
+              className="hero-btn primary"
+              onClick={() =>
+                window.scrollTo({ top: 700, behavior: "smooth" })
+              }
+              type="button"
+            >
               Browse listings
             </button>
-            <button className="hero-btn secondary" onClick={() => openWhatsApp({ title: "General apartment inquiry", address: "Lagos", area: "Lagos" })}>
+            <button
+              className="hero-btn secondary"
+              onClick={() =>
+                openWhatsApp({
+                  title: "General apartment inquiry",
+                  address: "Lagos",
+                  area: "Lagos"
+                })
+              }
+              type="button"
+            >
               WhatsApp us
             </button>
           </div>
@@ -201,14 +235,21 @@ Message: ${payload.message}
           />
 
           <div className="filter-grid">
-            <select className="control" value={area} onChange={(e) => setArea(e.target.value)}>
-              <option>All</option>
+            <select
+              className="control"
+              value={area}
+              onChange={(e) => setArea(e.target.value)}
+            >
               {lagosAreas.map((item) => (
                 <option key={item}>{item}</option>
               ))}
             </select>
 
-            <select className="control" value={type} onChange={(e) => setType(e.target.value)}>
+            <select
+              className="control"
+              value={type}
+              onChange={(e) => setType(e.target.value)}
+            >
               {propertyTypes.map((item) => (
                 <option key={item}>{item}</option>
               ))}
@@ -225,7 +266,9 @@ Message: ${payload.message}
           </label>
 
           <div className="budget-wrap">
-            <label>Budget up to: <strong>{formatNGN(maxBudget)}</strong></label>
+            <label>
+              Budget up to: <strong>{formatNGN(maxBudget)}</strong>
+            </label>
             <input
               type="range"
               min="500000"
@@ -252,19 +295,28 @@ Message: ${payload.message}
       <section className="feature-row">
         <div className="feature-card">
           <h3>Available property types</h3>
-          <p>Apartment, Mini Flat, Duplex, Self Contain, Shortlet, Serviced Apartment, Airbnb-style.</p>
+          <p>
+            Apartment, Mini Flat, Duplex, Self Contain, Shortlet, Serviced
+            Apartment, Airbnb-style.
+          </p>
         </div>
         <div className="feature-card">
           <h3>Notifications</h3>
-          <p>Applications can notify WhatsApp at 08087156505 and send email-ready alerts to yomiannixz@gmail.com.</p>
+          <p>
+            Applications can notify WhatsApp at 08087156505 and send
+            email-ready alerts to yomiannixz@gmail.com.
+          </p>
         </div>
         <div className="feature-card">
           <h3>Admin review</h3>
-          <p>Admins can log in, review submitted applications, and monitor listing demand.</p>
+          <p>
+            Admins can log in, review submitted applications, and monitor
+            listing demand.
+          </p>
         </div>
       </section>
 
-      {error ? <div className="feedback error">{error}</div> : null>}
+      {error ? <div className="feedback error">{error}</div> : null}
       {loading ? <div className="feedback">Loading listings...</div> : null}
 
       <section className="listings-grid">
@@ -274,7 +326,9 @@ Message: ${payload.message}
             <div className="listing-body">
               <div className="tag-row">
                 <span className="tag area">{item.area}</span>
-                {item.verified ? <span className="tag verified">Verified</span> : null}
+                {item.verified ? (
+                  <span className="tag verified">Verified</span>
+                ) : null}
                 <span className="tag type">{item.type}</span>
               </div>
 
@@ -283,7 +337,13 @@ Message: ${payload.message}
 
               <p className="listing-price">
                 {formatNGN(item.annualRent || item.price)}{" "}
-                <span>{item.type === "Shortlet" || item.type === "Serviced Apartment" || item.type === "Airbnb-style" ? "/ stay" : "/ year"}</span>
+                <span>
+                  {item.type === "Shortlet" ||
+                  item.type === "Serviced Apartment" ||
+                  item.type === "Airbnb-style"
+                    ? "/ stay"
+                    : "/ year"}
+                </span>
               </p>
 
               <p className="listing-meta">
@@ -291,10 +351,18 @@ Message: ${payload.message}
               </p>
 
               <div className="card-actions">
-                <button className="primary-btn" type="button" onClick={() => setSelected(item)}>
+                <button
+                  className="primary-btn"
+                  type="button"
+                  onClick={() => setSelected(item)}
+                >
                   Apply now
                 </button>
-                <button className="secondary-btn" type="button" onClick={() => openWhatsApp(item)}>
+                <button
+                  className="secondary-btn"
+                  type="button"
+                  onClick={() => openWhatsApp(item)}
+                >
                   WhatsApp
                 </button>
               </div>
@@ -305,19 +373,55 @@ Message: ${payload.message}
 
       {selected ? (
         <div className="modal-backdrop" onClick={() => setSelected(null)}>
-          <div className="modal-card" onClick={(e) => e.stopPropagation()}>
-            <button className="close-btn" onClick={() => setSelected(null)} type="button">×</button>
+          <div
+            className="modal-card"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              className="close-btn"
+              onClick={() => setSelected(null)}
+              type="button"
+            >
+              ×
+            </button>
             <h2>Apply for {selected.title}</h2>
             <p>{selected.address}</p>
 
             <form className="application-form" onSubmit={submitApplication}>
-              <input name="name" className="control" placeholder="Full name" required />
-              <input name="email" className="control" placeholder="Email address" type="email" required />
-              <input name="phone" className="control" placeholder="Phone number" required />
-              <input name="moveInDate" className="control" type="date" required />
-              <textarea name="message" className="control textarea" placeholder="Tell us what you need" />
+              <input
+                name="name"
+                className="control"
+                placeholder="Full name"
+                required
+              />
+              <input
+                name="email"
+                className="control"
+                placeholder="Email address"
+                type="email"
+                required
+              />
+              <input
+                name="phone"
+                className="control"
+                placeholder="Phone number"
+                required
+              />
+              <input
+                name="moveInDate"
+                className="control"
+                type="date"
+                required
+              />
+              <textarea
+                name="message"
+                className="control textarea"
+                placeholder="Tell us what you need"
+              />
 
-              <button className="primary-btn" type="submit">Submit application</button>
+              <button className="primary-btn" type="submit">
+                Submit application
+              </button>
             </form>
           </div>
         </div>
@@ -325,8 +429,17 @@ Message: ${payload.message}
 
       {adminOpen ? (
         <div className="modal-backdrop" onClick={() => setAdminOpen(false)}>
-          <div className="modal-card admin-card" onClick={(e) => e.stopPropagation()}>
-            <button className="close-btn" onClick={() => setAdminOpen(false)} type="button">×</button>
+          <div
+            className="modal-card admin-card"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              className="close-btn"
+              onClick={() => setAdminOpen(false)}
+              type="button"
+            >
+              ×
+            </button>
 
             {!adminLoggedIn ? (
               <>
@@ -339,7 +452,9 @@ Message: ${payload.message}
                     value={adminPass}
                     onChange={(e) => setAdminPass(e.target.value)}
                   />
-                  <button className="primary-btn" type="submit">Login</button>
+                  <button className="primary-btn" type="submit">
+                    Login
+                  </button>
                 </form>
               </>
             ) : (
@@ -363,7 +478,9 @@ Message: ${payload.message}
                     applications.map((app) => (
                       <div className="admin-item" key={app.id}>
                         <strong>{app.name}</strong>
-                        <p>{app.email} · {app.phone}</p>
+                        <p>
+                          {app.email} · {app.phone}
+                        </p>
                         <p>{app.propertyTitle}</p>
                         <p>{app.moveInDate}</p>
                         <p>{app.message}</p>
